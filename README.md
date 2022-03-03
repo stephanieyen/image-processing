@@ -8,3 +8,4 @@ To run this project:
 * Have fun!
 
 ![Composite filter](https://github.com/stephanieyen/image-processing/blob/main/results/composite.png)
+To get this image, push three images: ```man.jpg``` (background image), ```doge.jpg``` (foreground image), and ```alpha.png``` (alpha channel of the foreground image), in that order. Then, use the **Get Alpha** filter (under Composite), and then the **Composite** filter (under Composite). 
