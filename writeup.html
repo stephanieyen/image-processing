@@ -1,0 +1,353 @@
+<head>
+    <!-- the next three lines try to discourage browser from keeping page in cache -->
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="cache-control" content="no-store">
+
+    <title> COS426 Assignment 1 &mdash; Image Processing &mdash; Writeup</title>
+    <link href="css/style.css" type="text/css" rel="stylesheet"/>
+</head>
+
+<body>
+    <script src="js/student.js"> </script>
+    <script src="coursejs/writeup.js"> </script>
+    <div class="main_div">
+
+        <h1> <div class=assignment>COS426 Assignment 1</div>Image Processing &mdash; Batch Mode</h1>
+        <h2>Switch to: <a href='index.html'>Interactive Editor</a></h2>
+        <div class='selectable'>
+        <h2 id='student'></h2>
+        
+        I am applying 1 late day to this assignment.
+        <br><br>Features Implemented:
+<ul>
+<li>(0.0) <a href='#Brightness'>Brightness</a></li>
+<li>(0.5) <a href='#Contrast'>Contrast</a></li>
+<li>(0.5) <a href='#Gamma'>Gamma</a></li>
+<li>(2.0) <a href='#Histogram+equalization'>Histogram Equalization</a></li>
+<li>(0.5) <a href='#Saturation'>Saturation</a></li>
+<li>(1.5) <a href='#White+balance'>White Balance</a></li>
+<li>(2.0) <a href='#Histogram+matching'>Histogram Matching</a></li>
+<li>(1.0) <a href='#Gaussian'>Gaussian Filter</a></li>
+<li>(0.5) <a href='#Sharpen'>Sharpen Filter</a></li>
+<li>(0.5) <a href='#Edge+detect'>Edge Detect Filter</a></li>
+<li>(2.0) <a href='#Bilateral+filter'>Bilateral Filter</a></li>
+<li>(0.0) <a href='#Quantize'>Quantize</a></li>
+<li>(0.5) <a href='#Random+dither'>Random Dither</a></li>
+<li>(1.0) <a href='#Floyd-Steinberg+dither'>Floyd-Steinberg Dither</a></li>
+<li>(1.0) <a href='#Ordered+dither'>Ordered Dither</a></li>
+<li>(1.0) <a href='#Sampling'>Sampling</a></li>
+<li>(0.5) <a href='#Translate'>Translate</a></li>
+<li>(0.5) <a href='#Scale'>Scale</a></li>
+<li>(1.5) <a href='#Rotate'>Rotate</a></li>
+<li>(1.5) <a href='#Swirl'>Swirl</a></li>
+<li>(1.0) <a href='#Composite'>Composite</a></li>
+<li>(3.0) <a href='#Morph'>Morph</a></li>
+<li>(1.0) <a href='#Art+Contest'>Art Contest: Battle of the Chris's</a></li>
+        </ul></div>
+
+<p><hr><p><a name='Brightness'></a><h2>Brightness</h2><p><hr><p>
+
+    This feature was implemented by the course staff.
+    I used it as an example of how to loop over the pixels in an image.
+    <p>
+    Here is an example output where the image is made brighter with
+    <a href='batch.html?Push%20Image=flower.jpg&Brightness=0.3'>the
+    luminance slider set to 0.3</a>:
+    <p>
+    <img src='results/luminance0.3.png'>
+    <p>
+    Here is an example output where the image is made darker with
+    <a href='batch.html?Push%20Image=flower.jpg&Brightness=-0.5'>the
+    luminance slider set to -0.5</a>:
+    <p>
+    <img src='results/luminance-0.5.png'>
+    <p>
+    I did not encounter any particular challenges in implementing this.
+
+
+
+<br><p><hr><p><a name='Contrast'></a><h2>Contrast</h2><p><hr><p>
+    I implemented Contrast by iterating through all the pixels in the image. 
+    Then, for each color channel of the pixel, I applied the contrast change formula to perform the correct interpolation and clamped the value between [0, 1].
+
+    <p>Here is the output where the contrast is <a href='batch.html?Push_Image=leaves.jpg&Contrast=-1'>set to -1</a>.</p>
+    <img src='results/contrast-1.png'> 
+
+    <p>Here is the output where the contrast is <a href='batch.html?Push_Image=leaves.jpg&Contrast=0.7'>set to 0.7</a>.</p>
+    <img src='results/contrast0.7.png'> 
+
+    <p>Here is the output where the contrast is <a href='batch.html?Push_Image=leaves.jpg&Contrast=-0.8'>set to -0.8</a>.</p>
+    <img src='results/contrast-0.8.png'> 
+
+
+
+<br><p><hr><p><a name='Gamma'></a><h2>Gamma</h2><p><hr><p>
+    I implemented Gamma by iterating through all the pixels in the image. 
+    Then, for each color channel of the pixel, I applied the gamma correction formula.
+
+    <p>Here is the output where the gamma is <a href='batch.html?Push_Image=mesa.jpg&Gamma=1'>set to 1</a>.</p>
+    <img src='results/gamma1.png'> 
+
+    <p>Here is the output where the gamma is <a href='batch.html?Push_Image=mesa.jpg&Gamma=-1.6'>set to -1.6</a>.</p>
+    <img src='results/gamma-1.6.png'> 
+
+
+
+<br><p><hr><p><a name='Histogram+equalization'></a><h2>Histogram Equalization</h2><p><hr><p>
+    I implemented Histogram Equalization by initializing arrays to represent the PDF (probability density function) and CDF (cumulative distribution function) of the number of pixels at each gray level (of which there are 256). 
+    <br><br>Next, I built the PDF by iterating through all pixels in the image, getting each pixel's luminance value [0, 1] by converting to the HSL color space, and finding the corresponding gray level for that pixel by multiplying that luminance by 255. Then, I incremented the number of pixels in the correct gray level. 
+    <br><br>After building the PDF, I built the CDF for looping through the PDF and cumulating the values at each index. I looped through the CDF to normalize it.
+    <br><br>Finally, I iterated through all pixels in the image once again to adjust each pixel's luminance value. After I converted the pixel to the HSL color space, I mapped the original luminance to the corresponding luminance in the CDF, by using the original value as the index in the CDF. After updating the luminance value, I converted the pixel back to the RGB color space.
+
+    <p>Here is the output where the histogram equalization filter is <a href='batch.html?Push_Image=flower.jpg&Histogram_Equalization='>applied to the flower image</a>.</p>
+    <img src='results/histequalflower.png'> 
+
+    <p>Here is the output where the histogram equalization filter is <a href='batch.html?Push_Image=leaves.jpg&Histogram_Equalization='>applied to the leaves image</a>.</p>
+    <img src='results/histequalleaves.png'> 
+
+
+
+<br><p><hr><p><a name='Saturation'></a><h2>Saturation</h2><p><hr><p>
+    I implemented Saturation by iterating through all the pixels in the image. 
+    Then, for each color channel of the pixel, I applied the saturation change formula to perform the correct interpolation and clamped the value between [0, 1].
+
+    <p>Here is the output where the saturation is <a href='batch.html?Push_Image=leaves.jpg&Saturation=1'>set to 1</a>.</p>
+    <img src='results/saturation1.png'> 
+
+    <p>Here is the output where the histogram equalization filter is <a href='batch.html?Push_Image=leaves.jpg&Saturation=-0.5'>set to -0.5</a>.</p>
+    <img src='results/saturation-0.5.png'> 
+
+
+
+<br><p><hr><p><a name='White+balance'></a><h2>White Balance</h2><p><hr><p>
+    I implemented White Balance by saving the color of white in the LMS color space. Then, I iterated through all the pixels in the image, saving each pixel also in the LMS color space.
+    For each color channel of the pixel, I divided by the LMS color of white and clamped the value between [0, 1]. Lastly, I converted the pixel back to the RGB color space. 
+
+    <p>Here is the output where the white balance filter is <a href='batch.html?Push_Image=town.jpg&White_Balance=[0.5,0.5,0.5,1]'>applied to the town image with a specified white color of (0.5, 0.5, 0.5, 1)</a>.</p>
+    <img src='results/whitebalance.png'> 
+
+
+
+<br><p><hr><p><a name='Histogram+matching'></a><h2>Histogram Matching</h2><p><hr><p>
+    I implemented Histogram Matching by computing the lightness histograms (PDFs and CDFs) of both the original image and reference image in a similar method to that of the Histogram Equalization filter. 
+    <br><br>Next, for each gray level in the original image, I found the gray level in the reference image such that the difference between each image's CDF value at their chosen gray level is minimized. 
+    <br><br>Finally, I iterated through all pixels in the original image to map each pixel's original luminance to the new corresponding gray level. This completes the matching of the original image's lightness histogram to that of the reference image. 
+
+    <p>Here is the output where the histogram matching filter is <a href='batch.html?Push_Image=leaves.jpg&Push_Image=flower.jpg&Histogram_Match='>applied to the leaves image, with the flower image as the reference image.</a>.</p>
+    <img src='results/histmatchleavesflower.png'> 
+
+
+
+<br><p><hr><p><a name='Gaussian'></a><h2>Gaussian Filter</h2><p><hr><p>
+    NOTE: All the filter operations (Gaussian, Sharpen, Edge Detect, Bilateral) operate on copies of the image to avoid overwriting original pixel values during convolution with the filter kernels. 
+
+    <br><br>I implemented Gaussian Filter by pre-computing the 1D Gaussian kernel based on the specified window size, where the weight at each location in the kernel is a function of its distance from the center. The kernel weights were normalized.
+    <br><br>Then, I implemented the linear separation optimization of the kernel by first blurring/convolving the original image with the 1D kernel in the vertical direction, then blurring/convolving the resulting image with the 1D kernel in the horizontal direction. 
+    The convolving process was done by iterating through all the pixels in the image, and at each pixel, iterating through all its neighboring pixels (in either the vertical or horizontal direction) within the specified window radius. Each color channel of the pixel was determined by summing the product of the kernel weights and the corresponding neighboring pixel values. 
+
+    <p>Here is the output where the Gaussian filter is <a href='batch.html?Push_Image=leaves.jpg&Gaussian=4'>set to 4</a>.</p>
+    <img src='results/gaussian4.png'> 
+
+    <p>Here is the output where the Gaussian filter is <a href='batch.html?Push_Image=man.jpg&Gaussian=7'>set to 7</a>.</p>
+    <img src='results/gaussian7.png'> 
+
+
+
+<br><p><hr><p><a name='Sharpen'></a><h2>Sharpen Filter</h2><p><hr><p>
+    I implemented Sharpen Filter by pre-computing the 3x3 sharpen kernel, which is the edge detection kernel with 1 added to the center value.
+    Then, I iterated through all the pixels in the image, and at each pixel, iterated through all its neighboring pixels within the specified window radius. Edge pixels were accounted for by clamping all the neighboring pixels within the width and height of the image. 
+    Each color channel of the pixel was determined by summing the product of the kernel weights and the corresponding neighboring pixel values. 
+
+    <p>Here is the output where the sharpen filter is <a href='batch.html?Push_Image=leaves.jpg&Sharpen='>applied to the leaves image</a>.</p>
+    <img src='results/sharpenleaves.png'> 
+
+    <p>Here is the output where the sharpen filter is <a href='batch.html?Push_Image=woman.jpg&Sharpen='>applied to the woman image</a>.</p>
+    <img src='results/sharpenwoman.png'>
+
+
+
+<br><p><hr><p><a name='Edge+detect'></a><h2>Edge Detect Filter</h2><p><hr><p>
+    I implemented Edge Detect Filter by pre-computing the 3x3 edge detection kernel. 
+    Then, I iterated through all the pixels in the image, and at each pixel, iterated through all its neighboring pixels within the specified window radius. Edge pixels were accounted for by clamping all the neighboring pixels within the width and height of the image. 
+    Each color channel of the pixel was determined by summing the product of the kernel weights and the corresponding neighboring pixel values. 
+    Finally, to make the visualization of the edge detection clearer, I inverted each color channel of the pixel.
+
+    <p>Here is the output where the edge detect filter is <a href='batch.html?Push_Image=leaves.jpg&Edge='>applied to the leaves image</a>.</p>
+    <img src='results/edgeleaves.png'> 
+
+    <p>Here is the output where the edge detect filter is <a href='batch.html?Push_Image=woman.jpg&Edge='>applied to the woman image</a>.</p>
+    <img src='results/edgewoman.png'>
+
+
+
+<br><p><hr><p><a name='Bilateral+filter'></a><h2>Bilateral Filter</h2><p><hr><p>
+    I implemented Bilateral Filter by initializing the 2D bilateral kernel based on the specified window size. 
+    <br><br>Next, I iterated through all the pixels in the image and computed the bilateral kernel at each pixel by iterating through all the neighboring pixels within the specified window radius. 
+    Each weight was based on the neighboring pixel's spatial distance and color distance from the pixel in question. 
+    <br><br>After computing the bilateral kernel, I iterated through all the neighboring pixels once again to convolve the pixel with the kernel. 
+    Each color channel of the pixel was determined by summing the product of the (normalized) kernel weights and the corresponding neighboring pixel values.
+
+    <p>Here is the output where the bilateral filter is <a href='batch.html?Push_Image=mesa.jpg&Bilateral=4;2'>applied with a sigmaR of 4 and a sigmaS of 2</a>.</p>
+    <img src='results/bilateral4;2.png'> 
+
+    <p>Here is the output where the bilateral filter is <a href='batch.html?Push_Image=mesa.jpg&Bilateral=5;3'>applied with a sigmaR of 5 and a sigmaS of 3</a>.</p>
+    <img src='results/bilateral5;3.png'> 
+
+
+
+<br><p><hr><p><a name='Random+dither'></a><h2>Random Dither</h2><p><hr><p>
+    I implemented Random Dither by first converting the image to grayscale, then iterating through all the pixels in the image. 
+    Then, random noise was generated based on the pixel's grayscale value, and the pixel was quantized to that value and clamped between [0, 1].
+
+    <p>Here is the output where the random dither filter is <a href='batch.html?Push_Image=mesa.jpg&Random='>applied to the mesa image</a>.</p>
+    <img src='results/randomdither.png'> 
+
+
+
+<br><p><hr><p><a name='Floyd-Steinberg+dither'></a><h2>Floyd-Steinberg Dither</h2><p><hr><p>
+    I implemented Floyd-Steinberg Dither by first converting the image to grayscale, then iterating through all the pixels in the image. 
+    Each pixel's neighboring pixels (to right, bottom left, bottom, and bottom right) were saved.
+    Then, for each color channel of the pixel, the pixel value was quantized, and the quantization error (difference between the original pixel value and quantized pixel value) was spread over the four neighboring pixels with the specified weights. 
+
+    <p>Here is the output where the Floyd-Steinberg dither filter is <a href='batch.html?Push_Image=mesa.jpg&Floyd-Steinberg='>applied to the mesa image</a>.</p>
+    <img src='results/floydsteinbergdither.png'> 
+
+
+
+<br><p><hr><p><a name='Ordered+dither'></a><h2>Ordered Dither</h2><p><hr><p>
+    I implemented Ordered Dither by first converting the image to grayscale, then pre-computing a 4x4 filter based on the "Bayer 4" pattern (from which the threshold values are derived).
+    Then, I iterated through all the pixels in the image, calculating the quantization error and threshold values at each pixel. 
+    For each color channel of the pixel, the pixel value was quantized; that is, it took on its "ceiling" or "floor" value based on the difference between the quantization error and threshold values. 
+
+    <p>Here is the output where the ordered dither filter is <a href='batch.html?Push_Image=mesa.jpg&Ordered='>applied to the mesa image</a>.</p>
+    <img src='results/ordereddither.png'> 
+
+
+
+<br><p><hr><p><a name='Sampling'></a><h2>Sampling</h2><p><hr><p>
+    I implemented Sampling (the utility function which samples an individual pixel) via three sample modes: bilinear, Gaussian, and point.
+    <br><br>1. Bilinear sampling defines a pixel's values based on the values of the four closest pixels in the specified image. 
+    To implement bilinear sampling, I clamped the input x- and y-coordinates within the image's width and heights, and saved the x- and y-coordinates of the four closest neighboring pixels. 
+    Then, for each color channel of the pixel, I performed linear interpolations between the neighboring pixels' values. 
+    <br><br>2. Gaussian sampling defines a pixel's values based on the application of a Gaussian kernel. 
+    To implement Gaussian sampling, I clamped the input x- and y-coordinates within the image's width and heights. 
+    Then, I pre-computed the linearly separable 1D kernel in a similar manner to the Gaussian filter. T
+    his was applied along the specified pixel's neighboring vertical pixels, then along the specified pixel's neighboring horizontal pixels.
+    <br><br>3. Point sampling defines a pixel's values by rounding each x- and y- coordinate to the nearest sample.
+
+
+
+<br><p><hr><p><a name='Translate'></a><h2>Translate</h2><p><hr><p>
+    NOTE: All the resampling operations (translate, scale, rotate, morph) operate on new images to avoid overwriting original pixel values during reconstruction of the image. 
+
+    <br><br>I implemented Translate by iterating through all the destination pixels in the new image (a copy of the old image) within the limits necessary for the translation. 
+    <br><br>Then, I looked up each pixel in the source image via a specified resampling technique and set the pixel in the new image equal to the sampled pixel.
+    The pixel's x- and y-coordinates fed into the sampling function were found by translating each coordinate respectively.
+
+    <p>Here is the output where the translate filter is <a href='batch.html?Push_Image=flower.jpg&Translate=-317;-182;point'>applied using point sampling</a>.</p>
+    <img src='results/translatepoint.png'> 
+
+    <p>Here is the output where the translate filter is <a href='batch.html?Push_Image=flower.jpg&Translate=-317;-182;bilinear'>applied using bilinear sampling</a>.</p>
+    <img src='results/translatebilinear.png'> 
+
+    <p>Here is the output where the translate filter is <a href='batch.html?Push_Image=flower.jpg&Translate=-317;-182;gaussian'>applied using gaussian sampling</a>.</p>
+    <img src='results/translategaussian.png'> 
+
+
+    
+<br><p><hr><p><a name='Scale'></a><h2>Scale</h2><p><hr><p>
+    I implemented Scale by iterating through all the destination pixels in the new image with width and height dimensions specified by the scaling ratio. 
+    <br><br>Then, I looked up each pixel in the source image via a specified resampling technique and set the pixel in the new image equal to the sampled pixel. 
+    The pixel's x- and y-coordinates fed into the sampling function were found by translating each coordinate with respect to the new image's center, scaling by the specified ratio, and translating in the opposite direction with respect to the source image's center.
+
+    <p>Here is the output where the scale filter is <a href='batch.html?Push_Image=mesa.jpg&Scale=2.03;point'>applied using point sampling</a>.</p>
+    <img src='results/scalepoint.png'> 
+
+    <p>Here is the output where the scale filter is <a href='batch.html?Push_Image=mesa.jpg&Scale=2.03;bilinear'>applied using bilinear sampling</a>.</p>
+    <img src='results/scalebilinear.png'> 
+
+    <p>Here is the output where the scale filter is <a href='batch.html?Push_Image=mesa.jpg&Scale=2.03;gaussian'>applied using gaussian sampling</a>.</p>
+    <img src='results/scalegaussian.png'> 
+
+
+
+<br><p><hr><p><a name='Rotate'></a><h2>Rotate</h2><p><hr><p>
+    I implemented Rotate by iterating through all the destination pixels in the new image.
+    In order to ensure that the full rotated image would be visible, I constructed the new image within a canvas with the dimensions of the length of the image's diagonal. 
+    <br><br>Then, I looked up each pixel in the source image via a specified resampling technique and set the pixel in the new image equal to the sampled pixel. 
+    The pixel's x- and y-coordinates fed into the sampling function were found by translating each coordinate with respect to the new image's center, rotating by the specified radians, and translating in the opposite direction with respect to the source image's center.
+    If the coordinates to be sampled were out-of-bounds of the source image, then the corresponding pixel in the new image was set to RGBA(0,0,0,0).
+
+    <p>Here is the output where the rotate filter is <a href='batch.html?Push_Image=mesa.jpg&Rotate=0.628318530718;point'>applied using point sampling</a>.</p>
+    <img src='results/rotatepoint.png'> 
+
+    <p>Here is the output where the rotate filter is <a href='batch.html?Push_Image=mesa.jpg&Rotate=0.628318530718;bilinear'>applied using bilinear sampling</a>.</p>
+    <img src='results/rotatebilinear.png'> 
+
+    <p>Here is the output where the rotate filter is <a href='batch.html?Push_Image=mesa.jpg&Rotate=0.628318530718;gaussian'>applied using gaussian sampling</a>.</p>
+    <img src='results/rotategaussian.png'> 
+
+
+
+<br><p><hr><p><a name='Swirl'></a><h2>Swirl</h2><p><hr><p>
+    I implemented Swirl by iterating through all the destination pixels in the new image (a copy of the old image).
+    <br><br>Then, I looked up each pixel in the source image via a specified resampling technique and set the pixel in the new image equal to the sampled pixel. 
+    The pixel's x- and y-coordinates fed into the sampling function were found by translating each coordinate with respect to the new image's center, rotating by a specified theta, and translating in the opposite direction with respect to the source image's center. 
+    The theta value to rotate by linearly increased with respect to the pixel's distance from the center of the image, creating the swirl effect.
+
+    <p>Here is the output where the swirl filter is <a href='batch.html?Push_Image=mesa.jpg&Swirl=(0,6.28318530718,0.628318530718)'>applied to the mesa image</a>.</p>
+    <img src='results/swirl.gif'> 
+
+
+
+<br></a><h2>Composite</h2><p><hr><p>
+    I implemented Composite by iterating through all the pixels in the same-sized images.
+    Then, for each color channel of the pixel in the background image, I performed a linear interpolation between the values of the pixel at that location in the foreground image and background image, using the alpha channel of the foreground image as the blending factor. 
+    This achieved the blending effect between the two images.
+
+    <p>Here is the output where the composite filter is <a href='batch.html?Push_Image=man.jpg&Push_Image=doge.jpg&Push_Image=alpha.png&Get_Alpha=&Composite='>applied to composite the doge image over the man image</a>.</p>
+    <img src='results/composite.png'> 
+
+
+
+<br><p><hr><p><a name='Morph'></a><h2>Morph</h2><p><hr><p>
+    I implemented Morph by morphing two images according to a set of correspondence lines, which were parsed from a specified JSON file. 
+    I first made a copy of the final image in which to construct the morphed picture. The main steps are as follows.
+    <br><br>1. Interpolate all line correspondences to create an intermediate image between the initial and final images.
+    <br><br>I first made a deep copy of the lines array holding the endpoints of the lines in the initial image in order to store the values for the intermediate line coordinates.
+    Then, for each line pair, I performed a linear interpolation between the x- and y-coordinates, respectively, of both of the line's endpoints in the initial image and final image, using alpha (the morph time frame) as the blending factor.
+    <br><br>2. Warp both the initial and final images to the intermediate correspondence, composed of the intermediate line coordinates that were calculated in the first step. 
+    <br><br>I called the utility function warpLines() to warp the lines accordingly. 
+    warpLines() essentially iterates through all pixels in the destination image, and then at each pixel, iterates through each line. This is because the x- and y-coordinates of the pixel in the destination image is calculated based on different weights from each line. 
+    <br><br>Within the iteration of all the lines at each pixel, I called the utility function warpLine() to execute an algorithm to warp a single line. 
+    This involved different linear algebra operations to map X in the destination image to an unknown pixel X' in the source image which contains the current line. 
+    <br><br>3. Blend the two warped images. 
+    I iterated through all pixels in the copied image. Then, for each color channel of the pixel, I performed a linear interpolation between the values of the pixel at that location in the initial-to-intermediate warped image and final-to-intermediate warped image, using alpha as the blending factor.
+
+    <p>Here is the output where the morph filter is <a href='batch.html?Push_Image=mesa.jpg&Swirl=(0,6.28318530718,0.628318530718)'>applied to two images of Trump</a>.</p>
+    <img src='results/morph.gif'> 
+
+
+
+<br><p><hr><p><a name='Art+Contest'></a><h2>Art Contest: Battle of the Chris's</h2><p><hr><p>
+    For my Art Contest submission, I used the morph filter to create a custom morph between two of the world's favorite Chris's: Chris Eisgruber and Chris Evans.
+    <br><br>To achieve this, I first found my two images, cropped them to the same aspect ratio, and ensured that they were the same size. 
+    To be able to properly use them in the GUI, I added these images to the assignment directory in the images folder and added them to the imageNames array in coursejs/guiConfig.js.
+    In the GUI, I pushed the two images and applied the morph filter. Then, I clicked "MorphLines", specified my correspondence lines in both images, and downloaded the JSON file of such lines.
+    I added the JSON file to the images folder as well as the morphLinesDropdownOptions array in coursejs/guiConfig.js. 
+    <br><br>Voila! The GUI now supports pushing both Chris images and applying the morph filter with the correct linesFile, chris.json.
+
+    <p>Here is the output where the morph filter is <a href='batch.html?Push_Image=chriseisgruber.jpeg&Push_Image=chrisevans.jpeg&Morph=0.5;point;chris.json'>applied to two images of Chris</a>.</p>
+    <img src='results/chris.gif'> 
+
+
+
+<p><hr><p><a name='Collaboration'></a><h2>Collaboration</h2><p><hr><p>
+            Arnav Kumar
+            <br><br>COS 426 Office Hours (Henry Wang)
+            <br><br>COS 426 resources (lectures, precepts, Piazza/Ed)
+            <br><br>The Internet
+    </div>
+</body>
+</html>
