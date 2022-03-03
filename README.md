@@ -7,4 +7,4 @@ To run this project:
 * Direct your browser to ```http://localhost:8000```. This will allow you to use the interactive GUI!
 * Have fun!
 
-![Composite filter](../master/results/composite.jpg)
+![Composite filter](https://github.com/stephanieyen/image-processing/blob/main/results/composite.png)
